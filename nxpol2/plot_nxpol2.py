@@ -46,7 +46,7 @@ def make_ppi_plots(
             vmin=vmin,
             vmax=vmax,
             sweep=sweep,
-            colorbar_orient="horizontal",
+            # colorbar_orient="horizontal",
             cmap=colourmap,
         )
         gl = ax.gridlines(
