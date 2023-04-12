@@ -23,6 +23,38 @@
             "max": 2,
             "num_colours": 6,
             "colourmap": "viridis"
+        },
+        "RhoHV": {
+            "min": 0.7,
+            "max": 1,
+            "num_colours": 6,
+            "colourmap": "viridis"
+        }
+    },
+    "ncas-mobile-x-band-radar-2": {
+        "dBZ": {
+            "min": -10,
+            "max": 60,
+            "num_colours": 7,
+            "colourmap": "pyart_HomeyerRainbow"
+        },
+        "ZDR": {
+            "min": -2,
+            "max": 4,
+            "num_colours": 6,
+            "colourmap": "viridis"
+        },
+        "KDP": {
+            "min": -1,
+            "max": 2,
+            "num_colours": 6,
+            "colourmap": "viridis"
+        },
+        "RhoHV": {
+            "min": 0.7,
+            "max": 1,
+            "num_colours": 6,
+            "colourmap": "viridis"
         }
     },
     "ncas-radar-mobile-ka-band-1": {
