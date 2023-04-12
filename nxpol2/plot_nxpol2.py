@@ -73,7 +73,7 @@ def make_ppi_plots(
             ax.add_artist(lines.Line2D(xs, ys, color="black"))
         plt.xlim(xlim)
         plt.ylim(ylim)
-        plt.savefig(f"{outdir}/quickplot_sweep{sweep}.png")
+        plt.savefig(f"{outdir}/quickplot_{var}_sweep{sweep}.png")
         plt.close()
 
 
