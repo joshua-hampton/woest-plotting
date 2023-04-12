@@ -77,7 +77,7 @@ def make_ppi_plots(
             sum(radar.rays_per_sweep["data"][0 : sweep + 1]) - 1
         ]
         plt.savefig(
-            f"{outdir}/{radar_name}_{radar.metadata['start_datetime']}_{var}_ele{sweep_elevation}.png"
+            f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace(('-','').replace(':',''))}_{var}_ele{sweep_elevation}.png"
         )
         plt.close()
 
