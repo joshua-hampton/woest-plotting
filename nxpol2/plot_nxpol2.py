@@ -73,7 +73,12 @@ def make_ppi_plots(
             ax.add_artist(lines.Line2D(xs, ys, color="black"))
         plt.xlim(xlim)
         plt.ylim(ylim)
-        plt.savefig(f"{outdir}/quickplot_{var}_sweep{sweep}.png")
+        sweep_elevation = radar.elevation["data"][
+            sum(radar.rays_per_sweep["data"][0 : {sweep + 1}]) - 1
+        ]
+        plt.savefig(
+            f"{outdir}/{radar_name}_{radar.metadata['start_datetime']}_{var}_ele{sweep_elevation}.png"
+        )
         plt.close()
 
 
