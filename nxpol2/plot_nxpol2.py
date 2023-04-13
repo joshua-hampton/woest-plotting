@@ -28,9 +28,8 @@ def make_ppi_plots(
     # get variable info
     vmin = var_scales[radar_name][var]["min"]
     vmax = var_scales[radar_name][var]["max"]
-    num_colours = var_scales[radar_name][var]["num_colours"]
+    # num_colours = var_scales[radar_name][var]["num_colours"]
     colourmap = var_scales[radar_name][var]["colourmap"]
-    print(num_colours, colourmap)
 
     # radar display
     display = pyart.graph.RadarMapDisplay(radar)
@@ -77,18 +76,39 @@ def make_ppi_plots(
             sum(radar.rays_per_sweep["data"][0 : sweep + 1]) - 1
         ]
         plt.savefig(
-            f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_ele{sweep_elevation}.png"
+            f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_ppi_ele{sweep_elevation}.png"
         )
         plt.close()
 
 
-def make_rhi_plots(radar, radar_name, outdir, var, var_scales):
+def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 15]):
     # get variable info
     vmin = var_scales[radar_name][var]["min"]
     vmax = var_scales[radar_name][var]["max"]
-    num_colours = var_scales[radar_name][var]["num_colours"]
+    # num_colours = var_scales[radar_name][var]["num_colours"]
     colourmap = var_scales[radar_name][var]["colourmap"]
-    return vmin, vmax, num_colours, colourmap
+
+    # radar display
+    display = pyart.graph.RadarMapDisplay(radar)
+
+    # make plots
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111)
+
+    display.plot_rhi(
+        var,
+        ax=ax,
+        vmin=vmin,
+        vmax=vmax,
+        colorbar_orient="horizontal",
+        cmap=colourmap,
+    )
+    plt.grid(linewidth=1, color="gray", alpha=0.3, linestyle="--")
+    plt.ylim(ylim)
+    plt.savefig(
+        f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_rhi.png"
+    )
+    plt.close()
 
 
 def main(
