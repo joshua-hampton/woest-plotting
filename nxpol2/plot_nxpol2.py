@@ -37,49 +37,53 @@ def make_ppi_plots(
 
     # make plots for each sweep
     for sweep in range(radar.nsweeps):
-        fig = plt.figure(figsize=(10, 8))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        display.plot_ppi_map(
-            var,
-            ax=ax,
-            resolution="10m",
-            vmin=vmin,
-            vmax=vmax,
-            sweep=sweep,
-            # colorbar_orient="horizontal",
-            cmap=colourmap,
-        )
-        gl = ax.gridlines(
-            crs=ccrs.PlateCarree(),
-            draw_labels=True,
-            linewidth=1,
-            color="gray",
-            alpha=0.3,
-            linestyle="--",
-        )
-        gl.top_labels = False
-        gl.right_labels = False
-        for line in outer_lines:
-            xs = [float(line[0].split(",")[0]), float(line[1].split(",")[0])]
-            ys = [float(line[0].split(",")[1]), float(line[1].split(",")[1])]
-            ax.add_artist(lines.Line2D(xs, ys, color="black"))
-        for line in h_lines:
-            xs = [float(line[0].split(",")[0]), float(line[1].split(",")[0])]
-            ys = [float(line[0].split(",")[1]), float(line[1].split(",")[1])]
-            ax.add_artist(lines.Line2D(xs, ys, color="black"))
-        for line in v_lines:
-            xs = [float(line[0].split(",")[0]), float(line[1].split(",")[0])]
-            ys = [float(line[0].split(",")[1]), float(line[1].split(",")[1])]
-            ax.add_artist(lines.Line2D(xs, ys, color="black"))
-        plt.xlim(xlim)
-        plt.ylim(ylim)
         sweep_elevation = radar.elevation["data"][
             sum(radar.rays_per_sweep["data"][0 : sweep + 1]) - 1
         ]
-        plt.savefig(
-            f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_ppi_ele{sweep_elevation}.png"
-        )
-        plt.close()
+        if int(sweep_elevation) != 90:
+            fig = plt.figure(figsize=(10, 8))
+            ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+            display.plot_ppi_map(
+                var,
+                ax=ax,
+                resolution="10m",
+                vmin=vmin,
+                vmax=vmax,
+                sweep=sweep,
+                # colorbar_orient="horizontal",
+                cmap=colourmap,
+            )
+            gl = ax.gridlines(
+                crs=ccrs.PlateCarree(),
+                draw_labels=True,
+                linewidth=1,
+                color="gray",
+                alpha=0.3,
+                linestyle="--",
+            )
+            gl.top_labels = False
+            gl.right_labels = False
+            for line in outer_lines:
+                xs = [float(line[0].split(",")[0]), float(line[1].split(",")[0])]
+                ys = [float(line[0].split(",")[1]), float(line[1].split(",")[1])]
+                ax.add_artist(lines.Line2D(xs, ys, color="black"))
+            for line in h_lines:
+                xs = [float(line[0].split(",")[0]), float(line[1].split(",")[0])]
+                ys = [float(line[0].split(",")[1]), float(line[1].split(",")[1])]
+                ax.add_artist(lines.Line2D(xs, ys, color="black"))
+            for line in v_lines:
+                xs = [float(line[0].split(",")[0]), float(line[1].split(",")[0])]
+                ys = [float(line[0].split(",")[1]), float(line[1].split(",")[1])]
+                ax.add_artist(lines.Line2D(xs, ys, color="black"))
+            plt.xlim(xlim)
+            plt.ylim(ylim)
+            plt.savefig(
+                f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_ppi_ele{sweep_elevation}.png"
+            )
+            print(
+                f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_ppi_ele{sweep_elevation}.png written"
+            )
+            plt.close()
 
 
 def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 15]):
@@ -108,6 +112,9 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 15]):
     plt.ylim(ylim)
     plt.savefig(
         f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_rhi.png"
+    )
+    print(
+        f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_rhi.png written"
     )
     plt.close()
 
