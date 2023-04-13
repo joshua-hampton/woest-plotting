@@ -9,6 +9,7 @@ import matplotlib.lines as lines
 import json
 import sys
 from utils import wescon_kml_grid
+import os
 
 variables = ["dBZ", "ZDR", "KDP", "RhoHV"]
 
@@ -114,11 +115,12 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 15]):
 def main(
     radarfile, outdir, variables=variables, radar_name="ncas-mobile-x-band-radar-2"
 ):
+    file_path="/".join(__file__.split("/")[:-1])
     radar = pyart.io.read(radarfile)
 
     # read in stuff from utils
-    outer_lines, h_lines, v_lines = wescon_kml_grid.read_kml("../WesConGrid.kml")
-    with open("utils/var_scales.json") as f:
+    outer_lines, h_lines, v_lines = wescon_kml_grid.read_kml(f"{file_path}/../WesConGrid.kml")
+    with open(f"{file_path}/utils/var_scales.json") as f:
         var_scales = json.load(f)
 
     # what type of radar scan
