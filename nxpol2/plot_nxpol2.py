@@ -41,6 +41,8 @@ def make_ppi_plots(
             sum(radar.rays_per_sweep["data"][0 : sweep + 1]) - 1
         ]
         if int(sweep_elevation) != 90:
+            if not os.path.exists(f"{outdir}/{sweep_elevation}deg"):
+                os.mkdir(f"{outdir}/{sweep_elevation}deg")
             fig = plt.figure(figsize=(10, 8))
             ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
             display.plot_ppi_map(
@@ -50,7 +52,7 @@ def make_ppi_plots(
                 vmin=vmin,
                 vmax=vmax,
                 sweep=sweep,
-                # colorbar_orient="horizontal",
+                colorbar_orient="horizontal",
                 cmap=colourmap,
             )
             gl = ax.gridlines(
@@ -78,10 +80,10 @@ def make_ppi_plots(
             plt.xlim(xlim)
             plt.ylim(ylim)
             plt.savefig(
-                f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_ppi_ele{sweep_elevation}.png"
+                f"{outdir}/{sweep_elevation}deg/{radar.metadata['start_datetime'].replace('-','').replace(':','').replace('Z','').replace('T','')}00{var}.ppi.png"
             )
             print(
-                f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_ppi_ele{sweep_elevation}.png written"
+                f"{outdir}/{sweep_elevation}deg/{radar.metadata['start_datetime'].replace('-','').replace(':','').replace('Z','').replace('T','')}00{var}.ppi.png written"
             )
             plt.close()
 
