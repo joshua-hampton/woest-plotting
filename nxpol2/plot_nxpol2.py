@@ -82,9 +82,6 @@ def make_ppi_plots(
             plt.savefig(
                 f"{outdir}/{sweep_elevation}deg/{radar.metadata['start_datetime'].replace('-','').replace(':','').replace('Z','').replace('T','')}00{var}.ppi.png"
             )
-            print(
-                f"{outdir}/{sweep_elevation}deg/{radar.metadata['start_datetime'].replace('-','').replace(':','').replace('Z','').replace('T','')}00{var}.ppi.png written"
-            )
             plt.close()
 
 
@@ -115,20 +112,19 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 15]):
     plt.savefig(
         f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_rhi.png"
     )
-    print(
-        f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_rhi.png written"
-    )
     plt.close()
 
 
 def main(
     radarfile, outdir, variables=variables, radar_name="ncas-mobile-x-band-radar-2"
 ):
-    file_path="/".join(__file__.split("/")[:-1])
+    file_path = "/".join(__file__.split("/")[:-1])
     radar = pyart.io.read(radarfile)
 
     # read in stuff from utils
-    outer_lines, h_lines, v_lines = wescon_kml_grid.read_kml(f"{file_path}/../WesConGrid.kml")
+    outer_lines, h_lines, v_lines = wescon_kml_grid.read_kml(
+        f"{file_path}/../WesConGrid.kml"
+    )
     with open(f"{file_path}/utils/var_scales.json") as f:
         var_scales = json.load(f)
 
