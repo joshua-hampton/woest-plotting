@@ -99,9 +99,9 @@ def make_ppi_plots(
                 ]
                 ax.add_artist(lines.Line2D(xs, ys, color="black"))
             for line in storm_boxes:
-                xs = [ float(line[i].split(",")[0]) for i in range(len(line)) ]
-                ys = [ float(line[i].split(",")[1]) for i in range(len(line)) ]
-                xy = (min(xs),min(ys))
+                xs = [float(line[i].split(",")[0]) for i in range(len(line))]
+                ys = [float(line[i].split(",")[1]) for i in range(len(line))]
+                xy = (min(xs), min(ys))
                 width = max(xs) - min(xs)
                 height = max(ys) - min(ys)
                 ax.add_artist(
@@ -114,19 +114,19 @@ def make_ppi_plots(
                         linewidth=2,
                     )
                 )
-            for k,v in labels.items():
+            for k, v in labels.items():
                 x = float(str(v).split(",")[0])
                 y = float(str(v).split(",")[1])
                 txt = mpl.text.Text(
-                    x = x,
-                    y = y,
-                    text = k,
-                    horizontalalignment = 'center',
-                    verticalalignment = 'center',
+                    x=x,
+                    y=y,
+                    text=k,
+                    horizontalalignment="center",
+                    verticalalignment="center",
                 )
-                txt.set_path_effects([pe.withStroke(linewidth=2, foreground='w')])
+                txt.set_path_effects([pe.withStroke(linewidth=2, foreground="w")])
                 ax.add_artist(txt)
-                
+
             plt.xlim(xlim)
             plt.ylim(ylim)
             plt.savefig(
