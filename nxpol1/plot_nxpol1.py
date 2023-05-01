@@ -1,9 +1,10 @@
 import pyart
 import cartopy.crs as ccrs
 
-# import matplotlib as mpl
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.lines as lines
+import matplotlib.patheffects as pe
 
 # from matplotlib.colors import ListedColormap
 import json
@@ -23,8 +24,10 @@ def make_ppi_plots(
     outer_lines,
     h_lines,
     v_lines,
-    xlim=[-3.6, -1],
-    ylim=[50.25, 51.75],
+    storm_boxes,
+    labels,
+    xlim=[-4.6, -1],
+    ylim=[49.75, 52.25],
 ):
     # get variable info
     vmin = var_scales[radar_name][var]["min"]
@@ -66,17 +69,64 @@ def make_ppi_plots(
             gl.top_labels = False
             gl.right_labels = False
             for line in outer_lines:
-                xs = [float(line[0].split(",")[0]), float(line[1].split(",")[0])]
-                ys = [float(line[0].split(",")[1]), float(line[1].split(",")[1])]
+                xs = [
+                    float(line[0].split(" ")[0].split(",")[0]),
+                    float(line[0].split(" ")[1].split(",")[0]),
+                ]
+                ys = [
+                    float(line[0].split(" ")[0].split(",")[1]),
+                    float(line[0].split(" ")[1].split(",")[1]),
+                ]
                 ax.add_artist(lines.Line2D(xs, ys, color="black"))
             for line in h_lines:
-                xs = [float(line[0].split(",")[0]), float(line[1].split(",")[0])]
-                ys = [float(line[0].split(",")[1]), float(line[1].split(",")[1])]
+                xs = [
+                    float(line[0].split(" ")[0].split(",")[0]),
+                    float(line[0].split(" ")[1].split(",")[0]),
+                ]
+                ys = [
+                    float(line[0].split(" ")[0].split(",")[1]),
+                    float(line[0].split(" ")[1].split(",")[1]),
+                ]
                 ax.add_artist(lines.Line2D(xs, ys, color="black"))
             for line in v_lines:
-                xs = [float(line[0].split(",")[0]), float(line[1].split(",")[0])]
-                ys = [float(line[0].split(",")[1]), float(line[1].split(",")[1])]
+                xs = [
+                    float(line[0].split(" ")[0].split(",")[0]),
+                    float(line[0].split(" ")[1].split(",")[0]),
+                ]
+                ys = [
+                    float(line[0].split(" ")[0].split(",")[1]),
+                    float(line[0].split(" ")[1].split(",")[1]),
+                ]
                 ax.add_artist(lines.Line2D(xs, ys, color="black"))
+            for line in storm_boxes:
+                xs = [ float(line[i].split(",")[0]) for i in range(len(line)) ]
+                ys = [ float(line[i].split(",")[1]) for i in range(len(line)) ]
+                xy = (min(xs),min(ys))
+                width = max(xs) - min(xs)
+                height = max(ys) - min(ys)
+                ax.add_artist(
+                    mpl.patches.Rectangle(
+                        xy,
+                        width,
+                        height,
+                        facecolor="#FFFFFF00",
+                        edgecolor="blue",
+                        linewidth=2,
+                    )
+                )
+            for k,v in labels.items():
+                x = float(str(v).split(",")[0])
+                y = float(str(v).split(",")[1])
+                txt = mpl.text.Text(
+                    x = x,
+                    y = y,
+                    text = k,
+                    horizontalalignment = 'center',
+                    verticalalignment = 'center',
+                )
+                txt.set_path_effects([pe.withStroke(linewidth=2, foreground='w')])
+                ax.add_artist(txt)
+                
             plt.xlim(xlim)
             plt.ylim(ylim)
             plt.savefig(
@@ -122,7 +172,7 @@ def main(
     radar = pyart.io.read(radarfile)
 
     # read in stuff from utils
-    outer_lines, h_lines, v_lines = wescon_kml_grid.read_kml(
+    outer_lines, h_lines, v_lines, storm_boxes, labels = wescon_kml_grid.read_kml(
         f"{file_path}/../WesConGrid.kml"
     )
     with open(f"{file_path}/utils/var_scales.json") as f:
@@ -149,6 +199,8 @@ def main(
                 outer_lines,
                 h_lines,
                 v_lines,
+                storm_boxes,
+                labels,
             )
         elif scan_type == "RHI":
             make_rhi_plots(
