@@ -11,7 +11,7 @@ import sys
 from utils import wescon_kml_grid
 import os
 
-variables = ["dBZ", "ZDR", "KDP", "RhoHV"]
+variables = ["dBZ", "ZDR", "KDP", "RhoHV", "V"]
 
 
 def make_ppi_plots(
