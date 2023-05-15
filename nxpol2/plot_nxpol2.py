@@ -13,6 +13,7 @@ from utils import wescon_kml_grid
 import os
 
 variables = ["dBZ", "ZDR", "KDP", "RhoHV", "V"]
+desired_elevations = [1.0, 2.0, 3.0]
 
 
 def make_ppi_plots(
@@ -28,6 +29,7 @@ def make_ppi_plots(
     labels,
     xlim=[-4.6, -1],
     ylim=[49.75, 52.25],
+    desired_elevations=[1.0],
 ):
     # get variable info
     vmin = var_scales[radar_name][var]["min"]
@@ -43,7 +45,7 @@ def make_ppi_plots(
         sweep_elevation = radar.elevation["data"][
             sum(radar.rays_per_sweep["data"][0 : sweep + 1]) - 1
         ]
-        if int(sweep_elevation) != 90:
+        if float(sweep_elevation) in desired_elevations:
             if not os.path.exists(f"{outdir}/{sweep_elevation}deg"):
                 os.mkdir(f"{outdir}/{sweep_elevation}deg")
             fig = plt.figure(figsize=(10, 8))
@@ -201,6 +203,7 @@ def main(
                 v_lines,
                 storm_boxes,
                 labels,
+                desired_elevations=desired_elevations
             )
         elif scan_type == "RHI":
             make_rhi_plots(
