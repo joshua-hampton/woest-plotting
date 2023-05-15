@@ -203,7 +203,7 @@ def main(
                 v_lines,
                 storm_boxes,
                 labels,
-                desired_elevations=desired_elevations
+                desired_elevations=desired_elevations,
             )
         elif scan_type == "RHI":
             make_rhi_plots(
