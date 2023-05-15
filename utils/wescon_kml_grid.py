@@ -22,6 +22,8 @@ def read_kml(kml_file):
     outer_lines = []
     h_lines = []
     v_lines = []
+    storm_boxes = []
+    labels = {}
     for i in doc.iter():
         if "Document" in i.__dir__():
             for f in i.Document.Folder:
@@ -61,4 +63,21 @@ def read_kml(kml_file):
                                 ]
                             )
                         )
-    return outer_lines, h_lines, v_lines
+                elif f.name == "StormBoxes":
+                    for p in f.Placemark:
+                        storm_boxes.append(
+                            (
+                                [
+                                    i.strip()
+                                    for i in str(p.LineString.coordinates)
+                                    .strip()
+                                    .split(" ")
+                                ]
+                            )
+                        )
+                elif f.name == "Labels":
+                    for p in f.Placemark:
+                        label_name = p.name
+                        label_coord = p.Point.coordinates
+                        labels[label_name] = label_coord
+    return outer_lines, h_lines, v_lines, storm_boxes, labels
