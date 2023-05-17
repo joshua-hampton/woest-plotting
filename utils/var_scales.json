@@ -31,8 +31,8 @@
             "colourmap": "viridis"
         },
         "V": {
-            "min": -20,
-            "max": 20,
+            "min": -16,
+            "max": 16,
             "num_colours": 8,
             "colourmap": "RdBu_r"
         }
@@ -63,8 +63,8 @@
             "colourmap": "viridis"
         },
         "V": {
-            "min": -20,
-            "max": 20,
+            "min": -16,
+            "max": 16,
             "num_colours": 8,
             "colourmap": "RdBu_r"
         }
