@@ -11,6 +11,7 @@ import json
 import sys
 from utils import wescon_kml_grid
 import os
+import datetime as dt
 
 variables = ["dBZ", "ZDR", "KDP", "RhoHV", "V"]
 desired_elevations = [1.0, 2.0, 3.0]
@@ -131,9 +132,11 @@ def make_ppi_plots(
 
             plt.xlim(xlim)
             plt.ylim(ylim)
-            plt.savefig(
-                f"{outdir}/{sweep_elevation}deg/{radar.metadata['start_datetime'].replace('-','').replace(':','').replace('Z','').replace('T','')}00{var}.ppi.png"
+            sweep_time = dt.datetime.strftime(
+                pyart.graph.common.generate_radar_time_sweep(radar, sweep),
+                "%Y%m%d%H%M%S",
             )
+            plt.savefig(f"{outdir}/{sweep_elevation}deg/{sweep_time}00{var}.ppi.png")
             plt.close()
 
 
@@ -161,9 +164,10 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 15]):
     )
     plt.grid(linewidth=1, color="gray", alpha=0.3, linestyle="--")
     plt.ylim(ylim)
-    plt.savefig(
-        f"{outdir}/{radar_name}_{radar.metadata['start_datetime'].replace('-','').replace(':','')}_{var}_rhi.png"
+    sweep_time = dt.datetime.strftime(
+        pyart.graph.common.generate_radar_time_sweep(radar, 0), "%Y%m%d%H%M%S"
     )
+    plt.savefig(f"{outdir}/{radar_name}_{sweep_time}00{var}.rhi.png")
     plt.close()
 
 
