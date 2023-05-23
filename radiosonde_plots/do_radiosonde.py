@@ -48,17 +48,26 @@ def do_radiosondes(file_name, outdir):
         ignore_errors=True,
     )
 
-    plot_skewt(df, radiosonde_metadata["date"], radiosonde_metadata["time"], outdir)
+    for column_name in df.columns:
+        df = df.rename({column_name: column_name.strip()})
+
+    plot_skewt(
+        df,
+        radiosonde_metadata["date"],
+        radiosonde_metadata["time"],
+        radiosonde_metadata["location"],
+        outdir,
+    )
 
     df_small = df.select(
         [
             "Elapsed time",
             "HeightMSL",
-            "  RH",
-            "      Lat",
-            "      Lon",
-            "     P",
-            " Temp",
+            "RH",
+            "Lat",
+            "Lon",
+            "P",
+            "Temp",
             "Dir",
             "Speed",
         ]
@@ -68,11 +77,11 @@ def do_radiosondes(file_name, outdir):
         {
             "Elapsed time": "DataSrvTime",
             "HeightMSL": "Height",
-            "  RH": "Humidity",
-            "      Lat": "Latitude",
-            "      Lon": "Longitude",
-            "     P": "Pressure",
-            " Temp": "Temperature",
+            "RH": "Humidity",
+            "Lat": "Latitude",
+            "Lon": "Longitude",
+            "P": "Pressure",
+            "Temp": "Temperature",
             "Dir": "WindDir",
             "Speed": "WindSpeed",
         }

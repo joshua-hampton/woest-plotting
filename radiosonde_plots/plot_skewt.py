@@ -11,11 +11,11 @@ import os
 matplotlib.use("agg")
 
 
-def plot_skewt(df, radiosonde_date, radiosonde_time, outdir):
+def plot_skewt(df, radiosonde_date, radiosonde_time, radiosonde_location, outdir):
     hgt = list(df["HeightMSL"]) * units.m
-    p = list(df["     P"]) * units.hPa
-    T = list(df[" Temp"]) * units.degC
-    Td = list(df[" Dewp"]) * units.degC
+    p = list(df["P"]) * units.hPa
+    T = list(df["Temp"]) * units.degC
+    Td = list(df["Dewp"]) * units.degC
     wind_speed = list(df["Speed"] * 1.9438) * units.knots
     wind_dir = list(df["Dir"]) * units.degrees
     u, v = mpcalc.wind_components(wind_speed, wind_dir)
@@ -53,6 +53,8 @@ def plot_skewt(df, radiosonde_date, radiosonde_time, outdir):
     h.add_grid(increment=10)
     h.plot_colormapped(u, v, hgt)
 
+    skew.ax.set_title(f"{radiosonde_location} - {radiosonde_date} {radiosonde_time}Z")
+
     if not os.path.exists(f"{outdir}/{radiosonde_date}"):
         os.mkdir(f"{outdir}/{radiosonde_date}")
     plt.savefig(
@@ -79,6 +81,11 @@ def main(infile, outdir):
                 break
             elif data.startswith("Elapsed time"):
                 units_line_next = True
+            elif "Station name" in data:
+                radiosonde_location = "_".join(
+                    data.split("Station name")[1].strip().split(" ")
+                )
+                line_skip += 1
             else:
                 line_skip += 1
 
@@ -90,7 +97,7 @@ def main(infile, outdir):
         skip_rows_after_header=1,
         ignore_errors=True,
     )
-    plot_skewt(df, radiosonde_date, radiosonde_time, outdir)
+    plot_skewt(df, radiosonde_date, radiosonde_time, radiosonde_location, outdir)
 
 
 if __name__ == "__main__":
