@@ -15,7 +15,7 @@ import datetime as dt
 
 
 variables = ["dBZ", "ZDR", "KDP", "RhoHV", "V"]
-desired_elevations = [1.0, 2.0, 3.0]
+desired_elevations = [1.0, 1.5, 2.5]
 
 
 def make_ppi_plots(
