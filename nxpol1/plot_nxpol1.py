@@ -14,7 +14,7 @@ import os
 import datetime as dt
 
 variables = ["dBZ", "ZDR", "KDP", "RhoHV", "V"]
-desired_elevations = [1.0, 2.0, 3.0]
+desired_elevations = [1.0, 1.5, 2.5]
 
 
 def make_ppi_plots(
@@ -167,7 +167,7 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 15]):
     sweep_time = dt.datetime.strftime(
         pyart.graph.common.generate_radar_time_sweep(radar, 0), "%Y%m%d%H%M%S"
     )
-    plt.savefig(f"{outdir}/{radar_name}_{sweep_time}00{var}.rhi.png")
+    plt.savefig(f"{outdir}/rhi/{radar_name}_{sweep_time}00{var}.rhi.png")
     plt.close()
 
 
