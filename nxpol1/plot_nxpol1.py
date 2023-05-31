@@ -28,6 +28,7 @@ def make_ppi_plots(
     v_lines,
     storm_boxes,
     labels,
+    scan_mode,
     xlim=[-4.6, -1],
     ylim=[49.75, 52.25],
     desired_elevations=[1.0],
@@ -47,8 +48,8 @@ def make_ppi_plots(
             sum(radar.rays_per_sweep["data"][0 : sweep + 1]) - 1
         ]
         if float(sweep_elevation) in desired_elevations:
-            if not os.path.exists(f"{outdir}/{sweep_elevation}deg"):
-                os.mkdir(f"{outdir}/{sweep_elevation}deg")
+            if not os.path.exists(f"{outdir}/{scan_mode}_{sweep_elevation}deg"):
+                os.mkdir(f"{outdir}/{scan_mode}_{sweep_elevation}deg")
             fig = plt.figure(figsize=(10, 8))
             ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
             display.plot_ppi_map(
@@ -136,7 +137,9 @@ def make_ppi_plots(
                 pyart.graph.common.generate_radar_time_sweep(radar, sweep),
                 "%Y%m%d%H%M%S",
             )
-            plt.savefig(f"{outdir}/{sweep_elevation}deg/{sweep_time}00{var}.ppi.png")
+            plt.savefig(
+                f"{outdir}/{scan_mode}_{sweep_elevation}deg/{sweep_time}00{var}.ppi.png"
+            )
             plt.close()
 
 
@@ -199,6 +202,7 @@ def main(
     for var in variables:
         # make plot
         if scan_type == "PPI":
+            scan_mode = radarfile.split("/")[4]
             make_ppi_plots(
                 radar,
                 radar_name,
@@ -210,6 +214,7 @@ def main(
                 v_lines,
                 storm_boxes,
                 labels,
+                scan_mode,
                 desired_elevations=desired_elevations,
             )
         elif scan_type == "RHI":
