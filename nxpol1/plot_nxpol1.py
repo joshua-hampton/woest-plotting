@@ -202,7 +202,7 @@ def main(
     for var in variables:
         # make plot
         if scan_type == "PPI":
-            scan_mode = radarfile.split("/")[4]
+            scan_mode = radarfile.split("/")[5]
             make_ppi_plots(
                 radar,
                 radar_name,
