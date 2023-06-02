@@ -14,7 +14,7 @@ import os
 import datetime as dt
 
 
-variables = ["DBZ", "LDR"]
+variables = ["DBZ", "LDR", "VEL"]
 desired_elevations = [1.0, 1.5, 2.5]
 
 
@@ -61,6 +61,12 @@ def make_ppi_plots(
                 sweep=sweep,
                 colorbar_orient="horizontal",
                 cmap=colourmap,
+                mask_tuple=("SNR",1),
+            )
+            display.plot_range_rings(
+                [10,20,30,40],
+                col='black',
+                lw=1,
             )
             gl = ax.gridlines(
                 crs=ccrs.PlateCarree(),
@@ -72,6 +78,7 @@ def make_ppi_plots(
             )
             gl.top_labels = False
             gl.right_labels = False
+            """ 
             for line in outer_lines:
                 xs = [
                     float(line[0].split(" ")[0].split(",")[0]),
@@ -130,18 +137,20 @@ def make_ppi_plots(
                 )
                 txt.set_path_effects([pe.withStroke(linewidth=2, foreground="w")])
                 ax.add_artist(txt)
-
+            """
             plt.xlim(xlim)
             plt.ylim(ylim)
+
             sweep_time = dt.datetime.strftime(
                 pyart.graph.common.generate_radar_time_sweep(radar, sweep),
                 "%Y%m%d%H%M%S",
             )
+            ax.set_aspect(1./ax.get_data_ratio())
             plt.savefig(f"{outdir}/{sweep_elevation}deg/{sweep_time}00{var}.ppi.png")
             plt.close()
 
 
-def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 15]):
+def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 12]):
     # make out dir
     if not os.path.exists(f"{outdir}/rhi"):
         os.mkdir(f"{outdir}/rhi")
@@ -189,9 +198,9 @@ def main(
         var_scales = json.load(f)
 
     # what type of radar scan
-    if "SUR" in radarfile:
+    if "ppi" in radarfile:
         scan_type = "PPI"
-    elif "RHI" in radarfile:
+    elif "rhi" in radarfile:
         scan_type = "RHI"
     else:
         print("Unknown scan type, quitting...")
@@ -212,6 +221,8 @@ def main(
                 storm_boxes,
                 labels,
                 desired_elevations=desired_elevations,
+                xlim=[-2.6,-1.4],
+                ylim=[51.1,51.9],
             )
         elif scan_type == "RHI":
             make_rhi_plots(
