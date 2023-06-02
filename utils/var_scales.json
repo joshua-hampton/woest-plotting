@@ -1,7 +1,7 @@
 {
     "ncas-mobile-x-band-radar-1": {
         "dBZ": {
-            "min": -10,
+            "min": -20,
             "max": 60,
             "num_colours": 7,
             "colourmap": "pyart_HomeyerRainbow"
@@ -39,7 +39,7 @@
     },
     "ncas-mobile-x-band-radar-2": {
         "dBZ": {
-            "min": -10,
+            "min": -20,
             "max": 60,
             "num_colours": 7,
             "colourmap": "pyart_HomeyerRainbow"
