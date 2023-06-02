@@ -174,6 +174,7 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 12]):
         vmax=vmax,
         colorbar_orient="horizontal",
         cmap=colourmap,
+        mask_tuple=("SNR",1),
     )
     plt.grid(linewidth=1, color="gray", alpha=0.3, linestyle="--")
     plt.ylim(ylim)
