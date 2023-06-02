@@ -71,16 +71,22 @@
     },
     "ncas-radar-mobile-ka-band-1": {
         "DBZ": {
-            "min": -40,
-            "max": 40,
+            "min": -60,
+            "max": 30,
             "num_colours": 8,
             "colourmap": "pyart_HomeyerRainbow"
         },
         "LDR": {
             "min": -35,
-            "max": -10,
-            "num_colours": 5,
+            "max": 5,
+            "num_colours": 8,
             "colourmap": "viridis"
-        }
+        },
+	"VEL": {
+	    "min": -7.463,
+	    "max": 7.463,
+	    "num_colours": 8,
+	    "colourmap": "RdBu_r"
+	}
     }
 }
