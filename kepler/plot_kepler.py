@@ -356,6 +356,9 @@ def make_enhanced_rhi_plots(
     # left
     dist = ((xs - x2) ** 2 + (ys - y2) ** 2) ** 0.5
     dist_x, dist_y = np.where(dist == np.min(dist))
+    if len(dist_x) > 1:
+        dist_x = dist_x[0]
+        dist_y = dist_y[0]
     txt = mpl.text.Text(
         x=lons[dist_x, dist_y] - 0.03,
         y=lats[dist_x, dist_y] - 0.03,
@@ -368,6 +371,9 @@ def make_enhanced_rhi_plots(
     # right
     dist = ((xs - x1) ** 2 + (ys - y1) ** 2) ** 0.5
     dist_x, dist_y = np.where(dist == np.min(dist))
+    if len(dist_x) > 1:
+        dist_x = dist_x[0]
+        dist_y = dist_y[0]
     txt = mpl.text.Text(
         x=lons[dist_x, dist_y] + 0.02,
         y=lats[dist_x, dist_y] - 0.02,
