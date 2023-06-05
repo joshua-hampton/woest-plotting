@@ -331,6 +331,8 @@ def make_enhanced_rhi_plots(
 
     if rhi_angle > 180:
         rhi_angle2 = rhi_angle - 180
+    else:
+        rhi_angle2 = rhi_angle
     y1 = max_distance * np.cos(np.deg2rad(rhi_angle2))
     x1 = max_distance * np.sin(np.deg2rad(rhi_angle2))
     y2 = -y1
