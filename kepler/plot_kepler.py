@@ -169,6 +169,13 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 12]):
     fig = plt.figure(figsize=(10, 6))
     ax = fig.add_subplot(111)
 
+    rhi_angle = round(radar.fixed_angle["data"][0], 1)  # degrees
+    if (radar.elevation["data"][-1] - radar.elevation["data"][0]) > 0:
+        if (0 <= rhi_angle <= 90) or (180 <= rhi_angle <= 270):
+            reverse_xaxis = False
+        elif (90 < rhi_angle < 180) or (270 < rhi_angle < 360):
+            reverse_xaxis = True
+
     display.plot_rhi(
         var,
         ax=ax,
@@ -177,6 +184,7 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 12]):
         colorbar_orient="horizontal",
         cmap=colourmap,
         mask_tuple=("SNR", 1),
+        reverse_xaxis=reverse_xaxis,
     )
     plt.grid(linewidth=1, color="gray", alpha=0.3, linestyle="--")
     plt.ylim(ylim)
@@ -208,6 +216,7 @@ def make_enhanced_rhi_plots(
     # get variable info
     vmin = var_scales[radar_name][var]["min"]
     vmax = var_scales[radar_name][var]["max"]
+    colourmap = var_scales[radar_name][var]["colourmap"]
 
     # read in example radar file
     ex_radar = pyart.io.read(f"{file_loc}/example_ppi_l1_v1.0.nc")
@@ -220,10 +229,11 @@ def make_enhanced_rhi_plots(
     fig = plt.figure(figsize=(20, 8))
     ax = plt.subplot2grid((1, 3), (0, 0), colspan=2)
     rhi_angle = round(radar.fixed_angle["data"][0], 1)  # degrees
-    if rhi_angle < 180:
-        reverse_xaxis = True
-    else:
-        reverse_xaxis = False
+    if (radar.elevation["data"][-1] - radar.elevation["data"][0]) > 0:
+        if (0 <= rhi_angle <= 90) or (180 <= rhi_angle <= 270):
+            reverse_xaxis = False
+        elif (90 < rhi_angle < 180) or (270 < rhi_angle < 360):
+            reverse_xaxis = True
     display.plot_rhi(
         var,
         ax=ax,
@@ -233,6 +243,7 @@ def make_enhanced_rhi_plots(
         colorbar_orient="horizontal",
         title_flag=False,
         reverse_xaxis=reverse_xaxis,
+        cmap=colourmap,
     )
     plt.grid(linewidth=1, color="gray", alpha=0.3, linestyle="--")
     ax.set_ylim([0, 12])
