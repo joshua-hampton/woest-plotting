@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.lines as lines
 import matplotlib.patheffects as pe
 from netCDF4 import num2date
-
+import pathlib
 # from matplotlib.colors import ListedColormap
 import json
 import sys
@@ -200,6 +200,7 @@ def make_enhanced_rhi_plots(
     ylim=[0, 12],
     max_distance=40000,
 ):
+    file_loc = pathlib.Path(__file__).parent.resolve()
     # make out dir
     if not os.path.exists(f"{outdir}/enhanced_rhi"):
         os.mkdir(f"{outdir}/enhanced_rhi")
@@ -208,7 +209,7 @@ def make_enhanced_rhi_plots(
     vmax = var_scales[radar_name][var]["max"]
 
     # read in example radar file
-    ex_radar = pyart.io.read("example_ppi_l1_v1.0.nc")
+    ex_radar = pyart.io.read(f"{file_loc}/example_ppi_l1_v1.0.nc")
     # radar displays
     ex_display = pyart.graph.RadarMapDisplay(ex_radar)
     display = pyart.graph.RadarDisplay(radar)
