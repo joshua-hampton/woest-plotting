@@ -201,8 +201,8 @@ def make_enhanced_rhi_plots(
     max_distance=40000,
 ):
     # make out dir
-    if not os.path.exists(f"{outdir}/rhi"):
-        os.mkdir(f"{outdir}/rhi")
+    if not os.path.exists(f"{outdir}/enhanced_rhi"):
+        os.mkdir(f"{outdir}/enhanced_rhi")
     # get variable info
     vmin = var_scales[radar_name][var]["min"]
     vmax = var_scales[radar_name][var]["max"]
