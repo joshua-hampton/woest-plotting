@@ -7,6 +7,7 @@ import matplotlib.lines as lines
 import matplotlib.patheffects as pe
 from netCDF4 import num2date
 import pathlib
+
 # from matplotlib.colors import ListedColormap
 import json
 import sys
@@ -329,9 +330,9 @@ def make_enhanced_rhi_plots(
         ax.add_artist(txt)
 
     if rhi_angle > 180:
-        rhi_angle -= 180
-    y1 = max_distance * np.cos(np.deg2rad(rhi_angle))
-    x1 = max_distance * np.sin(np.deg2rad(rhi_angle))
+        rhi_angle2 = rhi_angle - 180
+    y1 = max_distance * np.cos(np.deg2rad(rhi_angle2))
+    x1 = max_distance * np.sin(np.deg2rad(rhi_angle2))
     y2 = -y1
     x2 = -x1
     ex_display.plot_line_xy([x1, x2], [y1, y2], color="blue")
