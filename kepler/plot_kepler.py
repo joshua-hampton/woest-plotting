@@ -170,11 +170,10 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 12]):
     ax = fig.add_subplot(111)
 
     rhi_angle = round(radar.fixed_angle["data"][0], 1)  # degrees
-    if (radar.elevation["data"][-1] - radar.elevation["data"][0]) > 0:
-        if (0 <= rhi_angle <= 90) or (180 <= rhi_angle <= 270):
-            reverse_xaxis = False
-        elif (90 < rhi_angle < 180) or (270 < rhi_angle < 360):
-            reverse_xaxis = True
+    if (0 <= rhi_angle <= 90) or (180 <= rhi_angle <= 270):
+        reverse_xaxis = False
+    elif (90 < rhi_angle < 180) or (270 < rhi_angle < 360):
+        reverse_xaxis = True
 
     display.plot_rhi(
         var,
@@ -228,12 +227,13 @@ def make_enhanced_rhi_plots(
     # start with rhi
     fig = plt.figure(figsize=(20, 8))
     ax = plt.subplot2grid((1, 3), (0, 0), colspan=2)
+
     rhi_angle = round(radar.fixed_angle["data"][0], 1)  # degrees
-    if (radar.elevation["data"][-1] - radar.elevation["data"][0]) > 0:
-        if (0 <= rhi_angle <= 90) or (180 <= rhi_angle <= 270):
-            reverse_xaxis = False
-        elif (90 < rhi_angle < 180) or (270 < rhi_angle < 360):
-            reverse_xaxis = True
+    if (0 <= rhi_angle <= 90) or (180 <= rhi_angle <= 270):
+        reverse_xaxis = False
+    elif (90 < rhi_angle < 180) or (270 < rhi_angle < 360):
+        reverse_xaxis = True
+
     display.plot_rhi(
         var,
         ax=ax,
