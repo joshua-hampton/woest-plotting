@@ -82,11 +82,49 @@
             "num_colours": 8,
             "colourmap": "viridis"
         },
-	"VEL": {
-	    "min": -7.463,
-	    "max": 7.463,
-	    "num_colours": 8,
-	    "colourmap": "RdBu_r"
-	}
+        "VEL": {
+            "min": -7.463,
+            "max": 7.463,
+            "num_colours": 8,
+            "colourmap": "RdBu_r"
+        }
+    },
+    "ncas-radar-wind-profiler-2": {
+        "eastward_wind": {
+            "min": -15,
+            "max": 15,
+            "num_colours": 9,
+            "colourmap": "RdBu_r"
+        },
+        "northward_wind": {
+            "min": -15,
+            "max": 15,
+            "num_colours": 9,
+            "colourmap": "RdBu_r"
+        },
+        "upward_wind": {
+            "min": -3,
+            "max": 3,
+            "num_colours": 5,
+            "colourmap": "RdBu_r"
+        },
+        "wind_speed": {
+            "min": 0,
+            "max": 25,
+            "num_colours": 5,
+            "colourmap": "viridis"
+        },
+        "wind_direction": {
+            "min": 50,
+            "max": 200,
+            "num_colours": 10,
+            "colourmap": "viridis"
+        },
+        "SNR": {
+            "min": 0,
+            "max": 45,
+            "num_colours": 9,
+            "colourmap": "viridis"
+        }
     }
 }
