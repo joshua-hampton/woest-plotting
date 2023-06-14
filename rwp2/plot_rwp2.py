@@ -1,8 +1,11 @@
 import re
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import json
 import sys
+import datetime as dt
+import os
 
 
 def read_ascii_file(filename):
@@ -16,9 +19,7 @@ def read_ascii_file(filename):
 
     while not headers and i < len(data):
         if re.match("\d{2}/\d{2}/\d{2}\s\d{2}:\d{2}", data[i]):
-            file_time = data[i].split(" ")[1]
-            hours, minutes = file_time.split(":")
-            time = (int(hours) * 60) + int(minutes)
+            time = dt.datetime.strptime(data[i], "%d/%m/%y %H:%M")
             i += 1
         elif data[i].startswith("Altitude") and data[i].endswith("SNR"):
             headers = data[i]
@@ -77,7 +78,7 @@ def read_ascii_file(filename):
 
 
 def read_all_files(infiles):
-    time_arr = np.ones(len(infiles)) * -1
+    time_list = []
     altitudes_arr = np.ones(len(infiles)) * -1
     east_wind_arr = np.ones(len(infiles)) * -1
     north_wind_arr = np.ones(len(infiles)) * -1
@@ -104,7 +105,7 @@ def read_all_files(infiles):
             wind_dir_arr = np.ones((len(infiles), len(altitudes))) * -1
             wind_speed_arr = np.ones((len(infiles), len(altitudes))) * -1
             snr_arr = np.ones((len(infiles), len(altitudes))) * -1
-        time_arr[i] = time
+        time_list.append(time)
         altitudes_arr[i] = altitudes
         east_wind_arr[i] = east_wind
         north_wind_arr[i] = north_wind
@@ -113,7 +114,7 @@ def read_all_files(infiles):
         wind_speed_arr[i] = wind_speed
         snr_arr[i] = snr
     return (
-        time_arr,
+        time_list,
         altitudes_arr,
         east_wind_arr,
         north_wind_arr,
@@ -133,12 +134,20 @@ def plot_variable(
     vmin=None,
     vmax=None,
     cmap="viridis",
+    cbar_label="",
 ):
     time_plot = time
     for i in range(np.shape(altitude)[1] - 1):
         time_plot = np.vstack([time, time_plot])
-    c = plt.pcolormesh(time_plot.T, altitude, var, vmin=vmin, vmax=vmax, cmap=cmap)
-    plt.colorbar(c)
+
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111)
+    c = ax.pcolormesh(time_plot.T, altitude, var, vmin=vmin, vmax=vmax, cmap=cmap)
+    ax.set_xlabel("Time (UTC)")
+    ax.set_ylabel("Altitude (m)")
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+    cbar = plt.colorbar(c)
+    cbar.set_label(cbar_label)
     plt.savefig(f"{outdir}/{filename}.png")
     plt.close()
 
@@ -154,6 +163,7 @@ def plot_winds(
     vmax=None,
     cmap="viridis",
     barb_interval=4,
+    cbar_label="",
 ):
     time_plot = time
     for i in range(np.shape(altitude)[1] - 1):
@@ -167,12 +177,19 @@ def plot_winds(
     ) * np.sign(north_wind)
     u1 = (v1 / north_wind) * east_wind
 
-    c = plt.pcolormesh(
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111)
+    c = ax.pcolormesh(
         time_plot.T, altitude, wind_speed, vmin=vmin, vmax=vmax, cmap=cmap
     )
-    plt.colorbar(c)
+    ax.set_xlabel("Time (UTC)")
+    ax.set_ylabel("Altitude (m)")
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
 
-    plt.quiver(
+    cbar = plt.colorbar(c)
+    cbar.set_label(cbar_label)
+
+    ax.quiver(
         time_plot.T[::barb_interval, ::barb_interval],
         altitude[::barb_interval, ::barb_interval],
         u1[::barb_interval, ::barb_interval],
@@ -192,7 +209,7 @@ def main(infiles, outdir):
         var_scales = json.load(f)["ncas-radar-wind-profiler-2"]
 
     (
-        time_arr,
+        time_list,
         altitudes_arr,
         east_wind_arr,
         north_wind_arr,
@@ -202,38 +219,46 @@ def main(infiles, outdir):
         snr_arr,
     ) = read_all_files(infiles)
 
+    # get date of middle time - avoids any overlap between previous or next day
+    date = time_list[int(len(time_list) / 2)].strftime("%Y-%m-%d")
+
+    os.mkdir(f"{outdir}/{date}")
+
     plot_variable(
         snr_arr,
-        time_arr,
+        time_list,
         altitudes_arr,
-        outdir=outdir,
+        outdir=f"{outdir}/{date}",
         filename="nrwp2_snr",
         vmin=var_scales["SNR"]["min"],
         vmax=var_scales["SNR"]["max"],
         cmap=var_scales["SNR"]["colourmap"],
+        cbar_label="SNR (dB)",
     )
 
     plot_variable(
         vertical_wind_arr,
-        time_arr,
+        time_list,
         altitudes_arr,
-        outdir=outdir,
+        outdir=f"{outdir}/{date}",
         filename="nrwp2_upward_wind",
         vmin=var_scales["upward_wind"]["min"],
         vmax=var_scales["upward_wind"]["max"],
         cmap=var_scales["upward_wind"]["colourmap"],
+        cbar_label="upward air velocity (m/s)",
     )
 
     plot_winds(
         east_wind_arr,
         north_wind_arr,
-        time_arr,
+        time_list,
         altitudes_arr,
-        outdir=outdir,
+        outdir=f"{outdir}/{date}",
         filename="nrwp2_winds",
         vmin=var_scales["wind_speed"]["min"],
         vmax=var_scales["wind_speed"]["max"],
         cmap=var_scales["wind_speed"]["colourmap"],
+        cbar_label="horizontal wind speed (m/s)",
     )
 
 

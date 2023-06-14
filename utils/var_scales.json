@@ -103,9 +103,9 @@
             "colourmap": "RdBu_r"
         },
         "upward_wind": {
-            "min": -3,
-            "max": 3,
-            "num_colours": 5,
+            "min": -2,
+            "max": 2,
+            "num_colours": 8,
             "colourmap": "RdBu_r"
         },
         "wind_speed": {
