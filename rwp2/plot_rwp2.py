@@ -248,7 +248,7 @@ def main(infiles, outdir):
         time_list,
         altitudes_arr,
         outdir=outdir,
-        filename="winds",
+        filename="horizontal_winds",
         vmin=var_scales["wind_speed"]["min"],
         vmax=var_scales["wind_speed"]["max"],
         cmap=var_scales["wind_speed"]["colourmap"],
