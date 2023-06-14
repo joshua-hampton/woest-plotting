@@ -5,7 +5,6 @@ import matplotlib.dates as mdates
 import json
 import sys
 import datetime as dt
-import os
 
 
 def read_ascii_file(filename):
@@ -219,16 +218,11 @@ def main(infiles, outdir):
         snr_arr,
     ) = read_all_files(infiles)
 
-    # get date of middle time - avoids any overlap between previous or next day
-    date = time_list[int(len(time_list) / 2)].strftime("%Y-%m-%d")
-
-    os.mkdir(f"{outdir}/{date}")
-
     plot_variable(
         snr_arr,
         time_list,
         altitudes_arr,
-        outdir=f"{outdir}/{date}",
+        outdir=outdir,
         filename="nrwp2_snr",
         vmin=var_scales["SNR"]["min"],
         vmax=var_scales["SNR"]["max"],
@@ -240,7 +234,7 @@ def main(infiles, outdir):
         vertical_wind_arr,
         time_list,
         altitudes_arr,
-        outdir=f"{outdir}/{date}",
+        outdir=outdir,
         filename="nrwp2_upward_wind",
         vmin=var_scales["upward_wind"]["min"],
         vmax=var_scales["upward_wind"]["max"],
@@ -253,7 +247,7 @@ def main(infiles, outdir):
         north_wind_arr,
         time_list,
         altitudes_arr,
-        outdir=f"{outdir}/{date}",
+        outdir=outdir,
         filename="nrwp2_winds",
         vmin=var_scales["wind_speed"]["min"],
         vmax=var_scales["wind_speed"]["max"],
