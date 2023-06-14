@@ -115,8 +115,8 @@
             "colourmap": "viridis"
         },
         "wind_direction": {
-            "min": 50,
-            "max": 200,
+            "min": 0,
+            "max": 360,
             "num_colours": 10,
             "colourmap": "viridis"
         },
