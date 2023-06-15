@@ -63,7 +63,7 @@ def make_ppi_plots(
                 sweep=sweep,
                 colorbar_orient="horizontal",
                 cmap=colourmap,
-                mask_tuple=("SNR", 1),
+                mask_tuple=("SNR", 0.5),
             )
             display.plot_range_rings(
                 [10, 20, 30, 40],
@@ -182,7 +182,7 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 12]):
         vmax=vmax,
         colorbar_orient="horizontal",
         cmap=colourmap,
-        mask_tuple=("SNR", 1),
+        mask_tuple=("SNR", 0.5),
         reverse_xaxis=reverse_xaxis,
     )
     plt.grid(linewidth=1, color="gray", alpha=0.3, linestyle="--")
@@ -239,7 +239,7 @@ def make_enhanced_rhi_plots(
         ax=ax,
         vmin=vmin,
         vmax=vmax,
-        mask_tuple=("SNR", 1),
+        mask_tuple=("SNR", 0.5),
         colorbar_orient="horizontal",
         title_flag=False,
         reverse_xaxis=reverse_xaxis,
