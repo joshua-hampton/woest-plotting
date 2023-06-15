@@ -38,7 +38,7 @@ def make_ppi_plots(
     # get variable info
     vmin = var_scales[radar_name][var]["min"]
     vmax = var_scales[radar_name][var]["max"]
-    # num_colours = var_scales[radar_name][var]["num_colours"]
+    num_colours = var_scales[radar_name][var]["num_colours"]
     colourmap = var_scales[radar_name][var]["colourmap"]
 
     # radar display
@@ -52,6 +52,8 @@ def make_ppi_plots(
         if float(sweep_elevation) in desired_elevations:
             if not os.path.exists(f"{outdir}/{sweep_elevation}deg"):
                 os.mkdir(f"{outdir}/{sweep_elevation}deg")
+                os.mkdir(f"{outdir}/{sweep_elevation}deg_reducedcolour")
+
             fig = plt.figure(figsize=(10, 8))
             ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
             display.plot_ppi_map(
@@ -151,15 +153,74 @@ def make_ppi_plots(
             plt.savefig(f"{outdir}/{sweep_elevation}deg/{sweep_time}00{var}.ppi.png")
             plt.close()
 
+            # same again but with reduced colours on plot
+            # make colour map
+            if colourmap == "pyart_HomeyerRainbow":
+                start_point = 1
+            else:
+                start_point = 0
+            cmap_s = plt.get_cmap(colourmap, num_colours)
+            cmaplist = [cmap_s(i) for i in range(start_point, cmap_s.N)]
+            if start_point == 1:
+                cmaplist.append((112 / 256.0, 12 / 256.0, 179 / 256.0, 1.0))
+            cmap_s = mpl.colors.LinearSegmentedColormap.from_list(
+                "Custom cmap", cmaplist, cmap_s.N
+            )
+
+            # make plot
+            fig = plt.figure(figsize=(10, 8))
+            ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+            display.plot_ppi_map(
+                var,
+                ax=ax,
+                resolution="10m",
+                vmin=vmin,
+                vmax=vmax,
+                sweep=sweep,
+                colorbar_orient="horizontal",
+                cmap=cmap_s,
+                mask_tuple=("SNR", 0.5),
+            )
+            display.plot_range_rings(
+                [10, 20, 30, 40],
+                col="black",
+                lw=1,
+            )
+            gl = ax.gridlines(
+                crs=ccrs.PlateCarree(),
+                draw_labels=True,
+                linewidth=1,
+                color="gray",
+                alpha=0.3,
+                linestyle="--",
+            )
+            gl.top_labels = False
+            gl.right_labels = False
+
+            plt.xlim(xlim)
+            plt.ylim(ylim)
+
+            sweep_time = dt.datetime.strftime(
+                pyart.graph.common.generate_radar_time_sweep(radar, sweep),
+                "%Y%m%d%H%M%S",
+            )
+            ax.set_aspect(1.0 / ax.get_data_ratio())
+            plt.savefig(
+                f"{outdir}/{sweep_elevation}deg_reducedcolour/{sweep_time}00{var}.ppi.png"
+            )
+            plt.close()
+
 
 def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 12]):
     # make out dir
     if not os.path.exists(f"{outdir}/rhi"):
         os.mkdir(f"{outdir}/rhi")
+        os.mkdir(f"{outdir}/rhi_reducedcolour")
+
     # get variable info
     vmin = var_scales[radar_name][var]["min"]
     vmax = var_scales[radar_name][var]["max"]
-    # num_colours = var_scales[radar_name][var]["num_colours"]
+    num_colours = var_scales[radar_name][var]["num_colours"]
     colourmap = var_scales[radar_name][var]["colourmap"]
 
     # radar display
@@ -193,6 +254,48 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 12]):
     plt.savefig(f"{outdir}/rhi/{sweep_time}00{var}.rhi.png")
     plt.close()
 
+    # same again but with reduced colours on plot
+    # make colour map
+    if colourmap == "pyart_HomeyerRainbow":
+        start_point = 1
+    else:
+        start_point = 0
+    cmap_s = plt.get_cmap(colourmap, num_colours)
+    cmaplist = [cmap_s(i) for i in range(start_point, cmap_s.N)]
+    if start_point == 1:
+        cmaplist.append((112 / 256.0, 12 / 256.0, 179 / 256.0, 1.0))
+    cmap_s = mpl.colors.LinearSegmentedColormap.from_list(
+        "Custom cmap", cmaplist, cmap_s.N
+    )
+
+    # make plots
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111)
+
+    rhi_angle = round(radar.fixed_angle["data"][0], 1)  # degrees
+    if (0 <= rhi_angle <= 90) or (180 <= rhi_angle <= 270):
+        reverse_xaxis = False
+    elif (90 < rhi_angle < 180) or (270 < rhi_angle < 360):
+        reverse_xaxis = True
+
+    display.plot_rhi(
+        var,
+        ax=ax,
+        vmin=vmin,
+        vmax=vmax,
+        colorbar_orient="horizontal",
+        cmap=cmap_s,
+        mask_tuple=("SNR", 0.5),
+        reverse_xaxis=reverse_xaxis,
+    )
+    plt.grid(linewidth=1, color="gray", alpha=0.3, linestyle="--")
+    plt.ylim(ylim)
+    sweep_time = dt.datetime.strftime(
+        pyart.graph.common.generate_radar_time_sweep(radar, 0), "%Y%m%d%H%M%S"
+    )
+    plt.savefig(f"{outdir}/rhi_reducedcolour/{sweep_time}00{var}.rhi.png")
+    plt.close()
+
 
 def make_enhanced_rhi_plots(
     radar,
@@ -212,10 +315,34 @@ def make_enhanced_rhi_plots(
     # make out dir
     if not os.path.exists(f"{outdir}/enhanced_rhi"):
         os.mkdir(f"{outdir}/enhanced_rhi")
+        os.mkdir(f"{outdir}/enhanced_rhi_reducedcolour")
+
     # get variable info
     vmin = var_scales[radar_name][var]["min"]
     vmax = var_scales[radar_name][var]["max"]
+    num_colours = var_scales[radar_name][var]["num_colours"]
     colourmap = var_scales[radar_name][var]["colourmap"]
+
+    # make colour map for reduced colours
+    if colourmap == "pyart_HomeyerRainbow":
+        start_point = 1
+    else:
+        start_point = 0
+    cmap_s = plt.get_cmap(colourmap, num_colours)
+    cmaplist = [cmap_s(i) for i in range(start_point, cmap_s.N)]
+    if start_point == 1:
+        cmaplist.append((112 / 256.0, 12 / 256.0, 179 / 256.0, 1.0))
+    cmap_s = mpl.colors.LinearSegmentedColormap.from_list(
+        "Custom cmap", cmaplist, cmap_s.N
+    )
+
+    plot_info = {
+        "main": {"colourmap": colourmap, "save_loc": f"{outdir}/enhanced_rhi"},
+        "reduced": {
+            "colourmap": cmap_s,
+            "save_loc": f"{outdir}/enhanced_rhi_reducedcolour",
+        },
+    }
 
     # read in example radar file
     ex_radar = pyart.io.read(f"{file_loc}/example_ppi_l1_v1.0.nc")
@@ -223,190 +350,194 @@ def make_enhanced_rhi_plots(
     ex_display = pyart.graph.RadarMapDisplay(ex_radar)
     display = pyart.graph.RadarDisplay(radar)
 
-    # make plot with subplots
-    # start with rhi
-    fig = plt.figure(figsize=(20, 8))
-    ax = plt.subplot2grid((1, 3), (0, 0), colspan=2)
+    for key in plot_info.keys():
+        colourmap = plot_info[key]["colourmap"]
+        save_loc = plot_info[key]["save_loc"]
 
-    rhi_angle = round(radar.fixed_angle["data"][0], 1)  # degrees
-    if (0 <= rhi_angle <= 90) or (180 <= rhi_angle <= 270):
-        reverse_xaxis = False
-    elif (90 < rhi_angle < 180) or (270 < rhi_angle < 360):
-        reverse_xaxis = True
+        # make plot with subplots
+        # start with rhi
+        fig = plt.figure(figsize=(20, 8))
+        ax = plt.subplot2grid((1, 3), (0, 0), colspan=2)
 
-    display.plot_rhi(
-        var,
-        ax=ax,
-        vmin=vmin,
-        vmax=vmax,
-        mask_tuple=("SNR", 0.5),
-        colorbar_orient="horizontal",
-        title_flag=False,
-        reverse_xaxis=reverse_xaxis,
-        cmap=colourmap,
-    )
-    plt.grid(linewidth=1, color="gray", alpha=0.3, linestyle="--")
-    ax.set_ylim([0, 12])
+        rhi_angle = round(radar.fixed_angle["data"][0], 1)  # degrees
+        if (0 <= rhi_angle <= 90) or (180 <= rhi_angle <= 270):
+            reverse_xaxis = False
+        elif (90 < rhi_angle < 180) or (270 < rhi_angle < 360):
+            reverse_xaxis = True
 
-    # second subplot
-    ax = plt.subplot2grid((1, 3), (0, 2), projection=ccrs.PlateCarree())
-    ex_display.plot_ppi_map(
-        var,
-        ax=ax,
-        resolution="10m",
-        vmin=vmin,
-        vmax=vmax,
-        sweep=0,
-        colorbar_flag=False,
-        mask_tuple=("SNR", 1e10),  # don't actually want to see data
-        title_flag=False,
-    )
-    ex_display.plot_range_rings(
-        [10, 20, 30, 40],
-        col="black",
-        lw=1,
-    )
-    ex_display.plot_range_rings(
-        [0.1],
-        col="black",
-        lw=3,
-    )
-    gl = ax.gridlines(
-        crs=ccrs.PlateCarree(),
-        draw_labels=True,
-        linewidth=1,
-        color="gray",
-        alpha=0.3,
-        linestyle="--",
-    )
-    gl.top_labels = False
-    gl.right_labels = False
-    for line in outer_lines:
-        xs = [
-            float(line[0].split(" ")[0].split(",")[0]),
-            float(line[0].split(" ")[1].split(",")[0]),
-        ]
-        ys = [
-            float(line[0].split(" ")[0].split(",")[1]),
-            float(line[0].split(" ")[1].split(",")[1]),
-        ]
-        ax.add_artist(lines.Line2D(xs, ys, color="black"))
-    for line in h_lines:
-        xs = [
-            float(line[0].split(" ")[0].split(",")[0]),
-            float(line[0].split(" ")[1].split(",")[0]),
-        ]
-        ys = [
-            float(line[0].split(" ")[0].split(",")[1]),
-            float(line[0].split(" ")[1].split(",")[1]),
-        ]
-        ax.add_artist(lines.Line2D(xs, ys, color="black"))
-    for line in v_lines:
-        xs = [
-            float(line[0].split(" ")[0].split(",")[0]),
-            float(line[0].split(" ")[1].split(",")[0]),
-        ]
-        ys = [
-            float(line[0].split(" ")[0].split(",")[1]),
-            float(line[0].split(" ")[1].split(",")[1]),
-        ]
-        ax.add_artist(lines.Line2D(xs, ys, color="black"))
-    for line in storm_boxes:
-        xs = [float(line[i].split(",")[0]) for i in range(len(line))]
-        ys = [float(line[i].split(",")[1]) for i in range(len(line))]
-        xy = (min(xs), min(ys))
-        width = max(xs) - min(xs)
-        height = max(ys) - min(ys)
-        ax.add_artist(
-            mpl.patches.Rectangle(
-                xy,
-                width,
-                height,
-                facecolor="#FFFFFF00",
-                edgecolor="blue",
-                linewidth=2,
-            )
+        display.plot_rhi(
+            var,
+            ax=ax,
+            vmin=vmin,
+            vmax=vmax,
+            mask_tuple=("SNR", 0.5),
+            colorbar_orient="horizontal",
+            title_flag=False,
+            reverse_xaxis=reverse_xaxis,
+            cmap=colourmap,
         )
-    for k, v in labels.items():
-        x = float(str(v).split(",")[0])
-        y = float(str(v).split(",")[1])
+        plt.grid(linewidth=1, color="gray", alpha=0.3, linestyle="--")
+        ax.set_ylim([0, 12])
+
+        # second subplot
+        ax = plt.subplot2grid((1, 3), (0, 2), projection=ccrs.PlateCarree())
+        ex_display.plot_ppi_map(
+            var,
+            ax=ax,
+            resolution="10m",
+            vmin=vmin,
+            vmax=vmax,
+            sweep=0,
+            colorbar_flag=False,
+            mask_tuple=("SNR", 1e10),  # don't actually want to see data
+            title_flag=False,
+        )
+        ex_display.plot_range_rings(
+            [10, 20, 30, 40],
+            col="black",
+            lw=1,
+        )
+        ex_display.plot_range_rings(
+            [0.1],
+            col="black",
+            lw=3,
+        )
+        gl = ax.gridlines(
+            crs=ccrs.PlateCarree(),
+            draw_labels=True,
+            linewidth=1,
+            color="gray",
+            alpha=0.3,
+            linestyle="--",
+        )
+        gl.top_labels = False
+        gl.right_labels = False
+        for line in outer_lines:
+            xs = [
+                float(line[0].split(" ")[0].split(",")[0]),
+                float(line[0].split(" ")[1].split(",")[0]),
+            ]
+            ys = [
+                float(line[0].split(" ")[0].split(",")[1]),
+                float(line[0].split(" ")[1].split(",")[1]),
+            ]
+            ax.add_artist(lines.Line2D(xs, ys, color="black"))
+        for line in h_lines:
+            xs = [
+                float(line[0].split(" ")[0].split(",")[0]),
+                float(line[0].split(" ")[1].split(",")[0]),
+            ]
+            ys = [
+                float(line[0].split(" ")[0].split(",")[1]),
+                float(line[0].split(" ")[1].split(",")[1]),
+            ]
+            ax.add_artist(lines.Line2D(xs, ys, color="black"))
+        for line in v_lines:
+            xs = [
+                float(line[0].split(" ")[0].split(",")[0]),
+                float(line[0].split(" ")[1].split(",")[0]),
+            ]
+            ys = [
+                float(line[0].split(" ")[0].split(",")[1]),
+                float(line[0].split(" ")[1].split(",")[1]),
+            ]
+            ax.add_artist(lines.Line2D(xs, ys, color="black"))
+        for line in storm_boxes:
+            xs = [float(line[i].split(",")[0]) for i in range(len(line))]
+            ys = [float(line[i].split(",")[1]) for i in range(len(line))]
+            xy = (min(xs), min(ys))
+            width = max(xs) - min(xs)
+            height = max(ys) - min(ys)
+            ax.add_artist(
+                mpl.patches.Rectangle(
+                    xy,
+                    width,
+                    height,
+                    facecolor="#FFFFFF00",
+                    edgecolor="blue",
+                    linewidth=2,
+                )
+            )
+        for k, v in labels.items():
+            x = float(str(v).split(",")[0])
+            y = float(str(v).split(",")[1])
+            txt = mpl.text.Text(
+                x=x,
+                y=y,
+                text=k,
+                horizontalalignment="center",
+                verticalalignment="center",
+            )
+            txt.set_path_effects([pe.withStroke(linewidth=2, foreground="w")])
+            ax.add_artist(txt)
+
+        if rhi_angle > 180:
+            rhi_angle2 = rhi_angle - 180
+        else:
+            rhi_angle2 = rhi_angle
+        y1 = max_distance * np.cos(np.deg2rad(rhi_angle2))
+        x1 = max_distance * np.sin(np.deg2rad(rhi_angle2))
+        y2 = -y1
+        x2 = -x1
+        ex_display.plot_line_xy([x1, x2], [y1, y2], color="blue")
+
+        # add rhi left/right labels
+        xs, ys, _ = radar.get_gate_x_y_z(0)
+        lats, lons, _ = radar.get_gate_lat_lon_alt(0)
+        # left
+        dist = ((xs - x2) ** 2 + (ys - y2) ** 2) ** 0.5
+        dist_x, dist_y = np.where(dist == np.min(dist))
+        if len(dist_x) > 1:
+            dist_x = dist_x[0]
+            dist_y = dist_y[0]
         txt = mpl.text.Text(
-            x=x,
-            y=y,
-            text=k,
+            x=lons[dist_x, dist_y] - 0.03,
+            y=lats[dist_x, dist_y] - 0.03,
+            text="L",
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
+        txt.set_path_effects([pe.withStroke(linewidth=2, foreground="w")])
+        ax.add_artist(txt)
+        # right
+        dist = ((xs - x1) ** 2 + (ys - y1) ** 2) ** 0.5
+        dist_x, dist_y = np.where(dist == np.min(dist))
+        if len(dist_x) > 1:
+            dist_x = dist_x[0]
+            dist_y = dist_y[0]
+        txt = mpl.text.Text(
+            x=lons[dist_x, dist_y] + 0.02,
+            y=lats[dist_x, dist_y] - 0.02,
+            text="R",
             horizontalalignment="center",
             verticalalignment="center",
         )
         txt.set_path_effects([pe.withStroke(linewidth=2, foreground="w")])
         ax.add_artist(txt)
 
-    if rhi_angle > 180:
-        rhi_angle2 = rhi_angle - 180
-    else:
-        rhi_angle2 = rhi_angle
-    y1 = max_distance * np.cos(np.deg2rad(rhi_angle2))
-    x1 = max_distance * np.sin(np.deg2rad(rhi_angle2))
-    y2 = -y1
-    x2 = -x1
-    ex_display.plot_line_xy([x1, x2], [y1, y2], color="blue")
+        ex_display.set_aspect_ratio(1.0 / ax.get_data_ratio())
 
-    # add rhi left/right labels
-    xs, ys, _ = radar.get_gate_x_y_z(0)
-    lats, lons, _ = radar.get_gate_lat_lon_alt(0)
-    # left
-    dist = ((xs - x2) ** 2 + (ys - y2) ** 2) ** 0.5
-    dist_x, dist_y = np.where(dist == np.min(dist))
-    if len(dist_x) > 1:
-        dist_x = dist_x[0]
-        dist_y = dist_y[0]
-    txt = mpl.text.Text(
-        x=lons[dist_x, dist_y] - 0.03,
-        y=lats[dist_x, dist_y] - 0.03,
-        text="L",
-        horizontalalignment="center",
-        verticalalignment="center",
-    )
-    txt.set_path_effects([pe.withStroke(linewidth=2, foreground="w")])
-    ax.add_artist(txt)
-    # right
-    dist = ((xs - x1) ** 2 + (ys - y1) ** 2) ** 0.5
-    dist_x, dist_y = np.where(dist == np.min(dist))
-    if len(dist_x) > 1:
-        dist_x = dist_x[0]
-        dist_y = dist_y[0]
-    txt = mpl.text.Text(
-        x=lons[dist_x, dist_y] + 0.02,
-        y=lats[dist_x, dist_y] - 0.02,
-        text="R",
-        horizontalalignment="center",
-        verticalalignment="center",
-    )
-    txt.set_path_effects([pe.withStroke(linewidth=2, foreground="w")])
-    ax.add_artist(txt)
+        ax.set_xlim([-3.6, -1])
+        ax.set_ylim([50.4, 51.9])
 
-    ex_display.set_aspect_ratio(1.0 / ax.get_data_ratio())
+        begin_time = num2date(
+            radar.time["data"][0],
+            radar.time["units"],
+            radar.time["calendar"],
+            only_use_cftime_datetimes=False,
+            only_use_python_datetimes=True,
+        )
+        time_str = begin_time.isoformat() + "Z"
+        fig.suptitle(
+            f"ncas-radar-mobile-ka-band-1 RHI {rhi_angle} deg\n{time_str}",
+            fontsize=20,
+        )
 
-    ax.set_xlim([-3.6, -1])
-    ax.set_ylim([50.4, 51.9])
-
-    begin_time = num2date(
-        radar.time["data"][0],
-        radar.time["units"],
-        radar.time["calendar"],
-        only_use_cftime_datetimes=False,
-        only_use_python_datetimes=True,
-    )
-    time_str = begin_time.isoformat() + "Z"
-    fig.suptitle(
-        f"ncas-radar-mobile-ka-band-1 RHI {rhi_angle} deg\n{time_str}",
-        fontsize=20,
-    )
-
-    sweep_time = dt.datetime.strftime(
-        pyart.graph.common.generate_radar_time_sweep(radar, 0), "%Y%m%d%H%M%S"
-    )
-    plt.savefig(f"{outdir}/enhanced_rhi/{sweep_time}00{var}.rhi.png")
-    plt.close()
+        sweep_time = dt.datetime.strftime(
+            pyart.graph.common.generate_radar_time_sweep(radar, 0), "%Y%m%d%H%M%S"
+        )
+        plt.savefig(f"{save_loc}/{sweep_time}00{var}.rhi.png")
+        plt.close()
 
 
 def main(
