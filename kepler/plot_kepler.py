@@ -52,6 +52,7 @@ def make_ppi_plots(
         if float(sweep_elevation) in desired_elevations:
             if not os.path.exists(f"{outdir}/{sweep_elevation}deg"):
                 os.mkdir(f"{outdir}/{sweep_elevation}deg")
+            if not os.path.exists(f"{outdir}/{sweep_elevation}deg_reducedcolour"):
                 os.mkdir(f"{outdir}/{sweep_elevation}deg_reducedcolour")
 
             fig = plt.figure(figsize=(10, 8))
@@ -215,6 +216,7 @@ def make_rhi_plots(radar, radar_name, outdir, var, var_scales, ylim=[0, 12]):
     # make out dir
     if not os.path.exists(f"{outdir}/rhi"):
         os.mkdir(f"{outdir}/rhi")
+    if not os.path.exists(f"{outdir}/rhi_reducedcolour"):
         os.mkdir(f"{outdir}/rhi_reducedcolour")
 
     # get variable info
@@ -315,6 +317,7 @@ def make_enhanced_rhi_plots(
     # make out dir
     if not os.path.exists(f"{outdir}/enhanced_rhi"):
         os.mkdir(f"{outdir}/enhanced_rhi")
+    if not os.path.exists(f"{outdir}/enhanced_rhi_reducedcolour"):
         os.mkdir(f"{outdir}/enhanced_rhi_reducedcolour")
 
     # get variable info
